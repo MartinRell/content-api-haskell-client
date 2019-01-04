@@ -11,6 +11,7 @@ module Network.Guardian.ContentApi
   , ContentApiError
   , contentSearch
   , tagSearch
+  , contentSearchExt
   ) where
 
 import Network.Guardian.ContentApi.Content
@@ -56,6 +57,27 @@ data ContentApiError = InvalidApiKey
                        deriving (Typeable, Show, Eq)
 
 instance Exception ContentApiError
+
+contentSearchExt :: ContentSearchQuery -> Maybe Int-> Maybe Int -> ContentApi ContentSearchResult
+contentSearchExt csq s n = do
+  url <- contentSearchUrlExt csq  psize pnum
+  search url
+  where
+    psize = case s of
+      Nothing   -> "200"
+      Just page -> T.pack $ show page
+
+    pnum = case n of
+      Nothing   -> "1"
+      Just page -> T.pack $ show page
+
+contentSearchUrlExt :: ContentSearchQuery -> Text -> Text -> ContentApi String
+contentSearchUrlExt ContentSearchQuery {..} psize pnum  =
+  mkUrl ["search"] $ param "q" csQueryText
+                  <> sectionParam csSection
+                  <> fieldsParam csShowFields
+                  <> param "page" (Just pnum)
+                  <> param "page-size" (Just psize)
 
 contentSearch :: ContentSearchQuery -> ContentApi ContentSearchResult
 contentSearch = search <=< contentSearchUrl
