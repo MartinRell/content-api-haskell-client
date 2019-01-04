@@ -80,6 +80,7 @@ contentSearchUrl ContentSearchQuery {..} =
   mkUrl ["search"] $ param "q" csQueryText
                   <> sectionParam csSection
                   <> fieldsParam csShowFields
+                  <> param "page-size" (Just "200")
 
 tagSearchUrl :: TagSearchQuery -> ContentApi String
 tagSearchUrl TagSearchQuery {..} =
